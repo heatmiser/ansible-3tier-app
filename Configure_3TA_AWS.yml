@@ -28,7 +28,7 @@
   tasks:
     - name: Check frontend(s) is responding on port 80
       uri:
-        url: "http://{{ item }}"
+        url: "http://{{ item.ansible_nodename }}"
         return_content: yes
       register: webpage
       with_items:
