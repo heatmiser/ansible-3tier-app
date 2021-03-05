@@ -3,7 +3,7 @@
 # tasks file for good-ansible
 - name: install HAProxy packages
   yum:
-    name: "['{{ packages }}']"
+    name: "{{ packages }}"
     state: latest
 - name: configure HAProxy from template
   template:
