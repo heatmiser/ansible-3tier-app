@@ -34,9 +34,6 @@
       with_items:
         - "{{ groups['AnsibleGroup_frontends'] }}"
 
-    - debug:
-        msg: "{{ webpage.results }}"
-
     - name: Fail if the page content does not have <Ansible has done its job>
       fail:
       when: '"Ansible has done its job - Welcome to Tomcat" not in item.content'
