@@ -1,0 +1,23 @@
+---
+
+# tasks file for good-ansible
+- name: install HAProxy packages
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - "{{ packages }}"
+- name: configure HAProxy from template
+  template:
+    src: haproxy.cfg.j2
+    dest: "{{ haproxy_cfg }}"
+  notify:
+    - restart_haproxy
+- name: start HAProxy service and enable HAProxy to start at boot time
+  service:
+    name: haproxy.service
+    enabled: yes
+  notify:
+    - restart_haproxy
+
+...

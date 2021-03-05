@@ -1,0 +1,21 @@
+---
+
+- name: install postgres packages
+  yum:
+    name: postgresql-server
+    state: latest
+- name: Check if PostgreSQL database is initialized.
+  stat:
+    path: "{{ pg_data }}"
+  register: pgdata_dir_version
+- name: Perform PostgreSQL database initialization if required.
+  command: postgresql-setup initdb
+  when: not pgdata_dir_version.stat.exists
+  notify:
+    - restart_postgresql
+- name: start PostgreSQL service and enable PostgreSQL to start at boot time
+  service:
+    name: postgresql.service
+    enabled: yes
+  notify:
+    - restart_postgresql
