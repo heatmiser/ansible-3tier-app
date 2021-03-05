@@ -10,14 +10,14 @@
 - name: Deploy application servers
   become: true
   hosts: AnsibleGroup_apps
-  gather_facts: false
+  gather_facts: true
   roles:
     - {name: app-tier, tags: [app-tier, apps, Tomcat]}
 
 - name: Deploy load balancer servers
   become: true
   hosts: AnsibleGroup_frontends
-  gather_facts: false
+  gather_facts: true
   roles:
     - {name: lb-tier, haproxy_group: AnsibleGroup_apps, tags: [lb-tier, lbs, HAProxy]}
 
@@ -28,7 +28,7 @@
   tasks:
     - name: Check frontend(s) is responding on port 80
       uri:
-        url: "http://{{ item }}"
+        url: "http://{{ hostvars[item]['ansible_nodename'] }}"
         return_content: yes
       register: webpage
       with_items:

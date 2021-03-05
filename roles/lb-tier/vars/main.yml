@@ -1,7 +1,9 @@
 ---
 # vars file for good-ansible
 packages:
-  - httpie
+# need EPEL repo to get python2-httpie 
+#  - httpie
+  - net-tools
   - haproxy
 haproxy_cfg: /etc/haproxy/haproxy.cfg
 haproxy_group: apps
