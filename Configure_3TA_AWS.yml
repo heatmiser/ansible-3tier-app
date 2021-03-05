@@ -10,7 +10,7 @@
 - name: Deploy application servers
   become: true
   hosts: AnsibleGroup_apps
-  gather_facts: false
+  gather_facts: true
   roles:
     - {name: app-tier, tags: [app-tier, apps, Tomcat]}
 
