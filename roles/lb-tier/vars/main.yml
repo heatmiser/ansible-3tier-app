@@ -1,5 +1,5 @@
 ---
-# vars file for good-ansible
+# vars file for lb-tier
 packages:
 # need EPEL repo to get python2-httpie 
 #  - httpie

@@ -1,5 +1,5 @@
 ---
-# handlers file for good-ansible
+# handlers file for lb-tier
 - name: restart_haproxy
   service:
     name: haproxy.service
