@@ -1,0 +1,4 @@
+host=jdbc:postgresql://{{ hostvars[groups['AnsibleGroup_appdbs'][0]].ansible_nodename }}/{{ pg_db_name }}
+username={{ pg_db_user }}
+password={{ pg_db_passwd }}
+driver=org.postgresql.Driver
