@@ -18,6 +18,13 @@
   notify:
     - restart_postgresql
 
+- name: start PostgreSQL service and enable PostgreSQL to start at boot time
+  service:
+    name: postgresql.service
+    enabled: yes
+  notify:
+    - restart_postgresql
+
 - name: Confgure PostgreSQL local access
   lineinfile:
     path: /var/lib/pgsql/data/pg_hba.conf
@@ -39,11 +46,6 @@
     path: /var/lib/pgsql/data/postgresql.conf
     regexp: 'listen_addresses ='
     line: listen_addresses = '*'
-
-- name: start PostgreSQL service and enable PostgreSQL to start at boot time
-  service:
-    name: postgresql.service
-    enabled: yes
   notify:
     - restart_postgresql
 
