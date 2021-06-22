@@ -16,9 +16,44 @@
   notify:
     - restart_postgresql
 
+- name: Confgure PostgreSQL local access
+  lineinfile:
+    path: /var/lib/pgsql/data/pg_hba.conf
+    regexp: 'local   all             all'
+    line: local   all             all                                  trust
+
+#- name: Confgure PostgreSQL remote access
+#  lineinfile:
+#    path: /var/lib/pgsql/data/pg_hba.conf
+#    regexp: 'host    all             all'
+#    line: host    all             all             0.0.0.0/0            md5
+
+- name: Configure PostgreSQL service listener address binding
+  lineinfile:
+    path: /var/lib/pgsql/data/postgresql.conf
+    regexp: 'listen_addresses ='
+    line: listen_addresses = '*'
+
 - name: start PostgreSQL service and enable PostgreSQL to start at boot time
   service:
     name: postgresql.service
     enabled: yes
   notify:
     - restart_postgresql
+
+- name: Create a new database with name "{{ pg_db_name }}"
+  postgresql_db:
+    name: "{{ pg_db_name }}"
+
+- name: Connect to {{ pg_db_name }} database, create {{ pg_db_user }}, and grant access to database
+  postgresql_user:
+    db: "{{ pg_db_name }}"
+    name: "{{ pg_db_user }}"
+    password: "{{ pg_db_passwd }}"
+
+- name: GRANT ALL PRIVILEGES ON DATABASE {{ pg_db_name }} TO {{ pg_db_name }}
+  postgresql_privs:
+    db: "{{ pg_db_name }}"
+    privs: ALL
+    type: database
+    role: "{{ pg_db_user }}"
