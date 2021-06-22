@@ -5,9 +5,9 @@
     name: tomcat
     state: latest
 
-- name: Print all hostvars variables for AnsibleGroup_appdbs[0]
-  debug: 
-    var: hostvars[groups['AnsibleGroup_appdbs'][0]]
+#- name: Print all hostvars variables for AnsibleGroup_appdbs[0]
+#  debug: 
+#    var: hostvars[groups['AnsibleGroup_appdbs'][0]]
 
 - name: Set tomcat_can_network_connect_db flag on and keep it persistent across reboots
   seboolean:
