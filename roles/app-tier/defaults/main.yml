@@ -1,2 +1,5 @@
 ---
 # defaults file for app-tier
+pg_db_name: db01
+pg_db_user: user01
+pg_db_passwd: Xtr4Sup3rS3cr3tP4ssw0rd?!
