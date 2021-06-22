@@ -4,10 +4,12 @@
   yum:
     name: tomcat
     state: latest
+
 - name: create tomcat ROOT directory
   file:
     path: "{{ webapps }}/ROOT"
     state: directory
+
 - name: copy index.html to tomcat webapps ROOT"
   template:
     src: index.html.j2
@@ -15,6 +17,7 @@
     mode: 0644
   notify:
     - restart_tomcat
+
 - name: start Tomcat service and enable Tomcat to start at boot time
   service:
     name: tomcat.service
