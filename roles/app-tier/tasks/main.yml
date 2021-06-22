@@ -5,6 +5,12 @@
     name: tomcat
     state: latest
 
+- name: Set tomcat_can_network_connect_db flag on and keep it persistent across reboots
+  seboolean:
+    name: tomcat_can_network_connect_db
+    state: yes
+    persistent: yes
+
 - name: create tomcat ROOT directory
   file:
     path: "{{ webapps }}/ROOT"
@@ -14,6 +20,14 @@
   template:
     src: index.html.j2
     dest: "{{ webapps }}/ROOT/index.html"
+    mode: 0644
+  notify:
+    - restart_tomcat
+
+- name: copy mydb.cfg to tomcat user home dir"
+  template:
+    src: mydb.cfg.j2
+    dest: /usr/share/tomcat/mydb.cfg
     mode: 0644
   notify:
     - restart_tomcat
