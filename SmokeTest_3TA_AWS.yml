@@ -60,4 +60,9 @@
 
     - debug:
         var: db_table_query
+
+    - name: Fail if database {{ pg_db_name }} did not contain table {{ smoke_test_table }}  
+      fail:
+      when: item.rowcount != 0
+      with_items: "{{ db_table_query.results }}"
 ...
