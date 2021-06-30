@@ -1,9 +1,14 @@
 ---
 
+- name: Facts from load balancer servers
+  become: true
+  hosts: AnsibleGroup_frontends
+  gather_facts: true
+
 - name: Smoke test the 3 Tier application
   hosts: localhost
   connection: local
-  gather_facts: true
+  gather_facts: false
   tasks:
     - name: Check frontend(s) is responding on port 80
       uri:
