@@ -3,7 +3,7 @@
 - name: Smoke test the 3 Tier application
   hosts: localhost
   connection: local
-  gather_facts: false
+  gather_facts: true
   tasks:
     - name: Check frontend(s) is responding on port 80
       uri:
