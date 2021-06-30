@@ -19,12 +19,26 @@
   file:
     path: "{{ webapps }}/ROOT"
     state: directory
+    owner: tomcat
+    group: tomcat
 
 - name: copy index.html to tomcat webapps ROOT"
   template:
     src: index.html.j2
     dest: "{{ webapps }}/ROOT/index.html"
     mode: 0644
+    owner: tomcat
+    group: tomcat
+  notify:
+    - restart_tomcat
+
+- name: Download application war and place in {{ webapps }}
+  get_url:
+    url: https://heatmiser-public-02.s3.us-east-2.amazonaws.com/JDBC_PostgreSQL_52.zip
+    dest: "{{ webapps }}/3ta.war"
+    mode: 0644
+    owner: tomcat
+    group: tomcat
   notify:
     - restart_tomcat
 
@@ -33,6 +47,8 @@
     src: mydb.cfg.j2
     dest: /usr/share/tomcat/mydb.cfg
     mode: 0644
+    owner: tomcat
+    group: tomcat
   notify:
     - restart_tomcat
 
