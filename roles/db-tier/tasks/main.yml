@@ -50,6 +50,11 @@
   notify:
     - restart_postgresql
 
+- name: restart PostgreSQL service
+  service:
+    name: postgresql.service
+    state: restarted
+
 - name: Create a new database with name "{{ pg_db_name }}"
   postgresql_db:
     name: "{{ pg_db_name }}"
