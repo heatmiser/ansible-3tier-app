@@ -43,16 +43,16 @@
       uri:
         url: "http://{{ hostvars[item]['ansible_nodename'] }}/3ta/connectordbbservlet?"
         return_content: yes
-      register: 3tapage
+      register: threetierpage
       with_items:
         - "{{ groups['AnsibleGroup_frontends'] }}"
 
     - debug:
-        var: 3tapage
+        var: threetierpage
 
     - name: Fail if the page content does not have "Please check the DB manually"
       fail:
       when: '"Please check the DB manually" not in item.content'
-      with_items: "{{ 3tapage.results }}"
+      with_items: "{{ threetierpage.results }}"
     
 ...
