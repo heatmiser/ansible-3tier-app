@@ -32,7 +32,7 @@
         - "{{ groups['AnsibleGroup_frontends'] }}"
 
     - set_fact:
-        smoke_test_table: "{{ threetierpage.results[0].content | trim | regex_replace('.*Table', '') }}"
+        smoke_test_table: "{{ threetierpage.results[0].content | replace('\n','') | regex_replace('.*Table', '') }}"
 
     - debug:
         var: smoke_test_table
