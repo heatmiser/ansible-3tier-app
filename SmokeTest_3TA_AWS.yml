@@ -48,7 +48,7 @@
       with_items: "{{ threetierpage.results }}"
 
     - name: query database {{ pg_db_name }} for newly created table {{ smoke_test_table }}
-      community.postgresql.postgresql_query:
+      postgresql_query:
         login_host: "{{ hostvars[item]['ansible_nodename'] }}"
         db: "{{ pg_db_name }}"
         login_user: "{{ pg_db_user }}"
