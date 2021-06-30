@@ -31,8 +31,9 @@
       with_items:
         - "{{ groups['AnsibleGroup_frontends'] }}"
 
+
     - debug:
-        var: threetierpage.results.content
+        var: threetierpage.results[0].content
 
     - name: Fail if the page content does not have "Please check the DB manually"
       fail:
