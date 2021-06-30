@@ -53,7 +53,7 @@
         db: "{{ pg_db_name }}"
         login_user: "{{ pg_db_user }}"
         login_password: "{{ pg_db_passwd }}"
-        query: "SELECT * FROM {{ smoke_test_table }}"
+        query: "SELECT * FROM \"{{ smoke_test_table }}\""
       with_items:
         - "{{ groups['AnsibleGroup_appdbs'] }}"
       register: db_table_query
