@@ -1,0 +1,37 @@
+---
+
+- name: Smoke test the 3 Tier application
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Check frontend(s) is responding on port 80
+      uri:
+        url: "http://{{ hostvars[item]['ansible_nodename'] }}"
+        return_content: yes
+      register: webpage
+      with_items:
+        - "{{ groups['AnsibleGroup_frontends'] }}"
+
+    - name: Fail if the page content does not have <Ansible has done its job>
+      fail:
+      when: '"Ansible has done its job - Welcome to Tomcat" not in item.content'
+      with_items: "{{ webpage.results }}"
+
+    - name: Check 3ta app frontend is working
+      uri:
+        url: "http://{{ hostvars[item]['ansible_nodename'] }}/3ta/connectordbbservlet?"
+        return_content: yes
+      register: threetierpage
+      with_items:
+        - "{{ groups['AnsibleGroup_frontends'] }}"
+
+    - debug:
+        var: threetierpage.results.content
+
+    - name: Fail if the page content does not have "Please check the DB manually"
+      fail:
+      when: '"Please check the DB manually" not in item.content'
+      with_items: "{{ threetierpage.results }}"
+    
+...
