@@ -33,7 +33,7 @@
 
 
     - debug:
-        var: threetierpage.results[0].content
+        var: threetierpage.results[0].content | regex_replace('^<html>(.*)Table \', '')
 
     - name: Fail if the page content does not have "Please check the DB manually"
       fail:
