@@ -39,4 +39,20 @@
       when: '"Ansible has done its job - Welcome to Tomcat" not in item.content'
       with_items: "{{ webpage.results }}"
 
+    - name: Check 3ta app frontend is working
+      uri:
+        url: "http://{{ hostvars[item]['ansible_nodename'] }}/3ta/connectordbbservlet?"
+        return_content: yes
+      register: 3tapage
+      with_items:
+        - "{{ groups['AnsibleGroup_frontends'] }}"
+
+    - debug:
+        var: 3tapage
+
+    - name: Fail if the page content does not have "Please check the DB manually"
+      fail:
+      when: '"Please check the DB manually" not in item.content'
+      with_items: "{{ 3tapage.results }}"
+    
 ...
