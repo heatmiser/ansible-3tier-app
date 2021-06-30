@@ -31,9 +31,11 @@
       with_items:
         - "{{ groups['AnsibleGroup_frontends'] }}"
 
+    - set_fact:
+        smoke_test_table: "{{ threetierpage.results[0].content | regex_replace('^<html>(.*)Table \', '') }}"
 
     - debug:
-        var: threetierpage.results[0].content | regex_replace('^<html>(.*)Table \', '')
+        var: smoke_test_table
 
     - name: Fail if the page content does not have "Please check the DB manually"
       fail:
