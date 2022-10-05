@@ -1,0 +1,6 @@
+---
+# stop tasks file for app-tier
+- name: stop Tomcat service
+  service:
+    name: tomcat.service
+    state: stopped

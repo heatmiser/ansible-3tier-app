@@ -1,0 +1,6 @@
+---
+# start tasks file for app-tier
+- name: start Tomcat service
+  service:
+    name: tomcat.service
+    state: started

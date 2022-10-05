@@ -1,0 +1,52 @@
+---
+- name: Stop load balancer servers
+  become: true
+  hosts: AnsibleGroup_frontends
+  gather_facts: false
+  tasks:
+    - name: Stop HAProxy service
+      ansible.builtin.include_role:
+        name: lb-tier
+        tasks_from: stop
+
+- name: Stop application servers
+  become: true
+  hosts: AnsibleGroup_apps
+  gather_facts: false
+  tasks:
+    - name: Stop Tomcat service
+      ansible.builtin.include_role:
+        name: app-tier
+        tasks_from: stop
+
+- name: Restart PostgreSQL service
+  become: true
+  hosts: AnsibleGroup_appdbs
+  gather_facts: false
+  tasks:
+    - name: Restart PostgreSQL service
+      ansible.builtin.include_role:
+        name: db-tier
+        tasks_from: restart
+
+- name: Start application servers
+  become: true
+  hosts: AnsibleGroup_apps
+  gather_facts: false
+  tasks:
+    - name: Start Tomcat service
+      ansible.builtin.include_role:
+        name: app-tier
+        tasks_from: start
+
+- name: Start load balancer servers
+  become: true
+  hosts: AnsibleGroup_frontends
+  gather_facts: false
+  tasks:
+    - name: Start HAProxy service
+      ansible.builtin.include_role:
+        name: lb-tier
+        tasks_from: start
+
+...

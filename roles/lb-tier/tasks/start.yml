@@ -1,0 +1,6 @@
+---
+# start tasks file for lb-tier
+- name: start HAProxy service
+  service:
+    name: haproxy.service
+    state: started

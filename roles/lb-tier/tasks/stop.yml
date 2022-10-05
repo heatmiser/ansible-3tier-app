@@ -1,0 +1,6 @@
+---
+# stop tasks file for lb-tier
+- name: stop HAProxy service
+  service:
+    name: haproxy.service
+    state: stopped
