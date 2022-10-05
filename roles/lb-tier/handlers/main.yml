@@ -1,5 +1,20 @@
 ---
 # handlers file for lb-tier
+- name: start_haproxy
+  service:
+    name: haproxy.service
+    state: started
+
+- name: stop_haproxy
+  service:
+    name: haproxy.service
+    state: stopped
+
+- name: reload_haproxy
+  service:
+    name: haproxy.service
+    state: reloaded
+
 - name: restart_haproxy
   service:
     name: haproxy.service
