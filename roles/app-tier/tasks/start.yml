@@ -1,6 +1,6 @@
 ---
 # start tasks file for app-tier
 - name: start Tomcat service
-  service:
+  ansible.builtin.service:
     name: tomcat.service
     state: started

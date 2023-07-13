@@ -1,6 +1,6 @@
 ---
 # stop tasks file for app-tier
 - name: stop Tomcat service
-  service:
+  ansible.builtin.service:
     name: tomcat.service
     state: stopped

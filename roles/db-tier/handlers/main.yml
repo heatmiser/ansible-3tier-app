@@ -1,21 +1,21 @@
 ---
 # handlers file for db-tier
 - name: start_postgresql
-  service:
+  ansible.builtin.service:
     name: postgresql.service
     state: started
 
 - name: stop_postgresql
-  service:
+  ansible.builtin.service:
     name: postgresql.service
     state: stopped
 
 - name: reload_postgresql
-  service:
+  ansible.builtin.service:
     name: postgresql.service
     state: reloaded
 
 - name: restart_postgresql
-  service:
+  ansible.builtin.service:
     name: postgresql.service
     state: restarted

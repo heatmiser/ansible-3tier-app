@@ -1,6 +1,6 @@
 ---
 # stop tasks file for lb-tier
 - name: stop HAProxy service
-  service:
+  ansible.builtin.service:
     name: haproxy.service
     state: stopped

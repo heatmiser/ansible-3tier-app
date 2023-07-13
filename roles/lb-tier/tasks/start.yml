@@ -1,6 +1,6 @@
 ---
 # start tasks file for lb-tier
 - name: start HAProxy service
-  service:
+  ansible.builtin.service:
     name: haproxy.service
     state: started

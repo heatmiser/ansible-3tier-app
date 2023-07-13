@@ -1,21 +1,21 @@
 ---
 # handlers file for app-tier
 - name: start_tomcat
-  service:
+  ansible.builtin.service:
     name: tomcat.service
     state: started
 
 - name: stop_tomcat
-  service:
+  ansible.builtin.service:
     name: tomcat.service
     state: stopped
 
 - name: reload_tomcat
-  service:
+  ansible.builtin.service:
     name: tomcat.service
     state: reloaded
 
 - name: restart_tomcat
-  service:
+  ansible.builtin.service:
     name: tomcat.service
     state: restarted
