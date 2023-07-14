@@ -16,39 +16,43 @@
   gather_facts: false
   tasks:
     - name: Check frontend(s) is responding on port 80
-      uri:
+      ansible.builtin.uri:
         url: "http://{{ hostvars[item]['ansible_nodename'] }}"
         return_content: yes
+        timeout: 5
       register: webpage
+      until: "webpage.status == 200"
+      retries: 12
+      delay: 10
       with_items:
         - "{{ groups['AnsibleGroup_frontends'] }}"
 
     - name: Fail if the page content does not have <Ansible has done its job>
-      fail:
+      ansible.builtin.fail:
       when: '"Ansible has done its job - Welcome to Tomcat" not in item.content'
       with_items: "{{ webpage.results }}"
 
     - name: Check 3ta app frontend is working
-      uri:
+      ansible.builtin.uri:
         url: "http://{{ hostvars[item]['ansible_nodename'] }}/3ta/connectordbbservlet?"
         return_content: yes
       register: threetierpage
       with_items:
         - "{{ groups['AnsibleGroup_frontends'] }}"
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         smoke_test_table: "{{ threetierpage.results[0].content | replace('\n','') | regex_replace('.*Table \\\"', '') | regex_replace('\\\" has been created.*$', '') }}"
 
-    - debug:
+    - ansible.builtin.debug:
         var: smoke_test_table
 
     - name: Fail if the page content does not have "Please check the DB manually"
-      fail:
+      ansible.builtin.fail:
       when: '"Please check the DB manually" not in item.content'
       with_items: "{{ threetierpage.results }}"
 
     - name: query database {{ pg_db_name }} for newly created table {{ smoke_test_table }}
-      postgresql_query:
+      community.postgresql.postgresql_query:
         login_host: "{{ hostvars[item]['ansible_nodename'] }}"
         db: "{{ pg_db_name }}"
         login_user: "{{ pg_db_user }}"
@@ -58,11 +62,11 @@
         - "{{ groups['AnsibleGroup_appdbs'] }}"
       register: db_table_query
 
-    - debug:
+    - ansible.builtin.debug:
         var: db_table_query
 
     - name: Fail if database {{ pg_db_name }} did not contain table {{ smoke_test_table }}  
-      fail:
+      ansible.builtin.fail:
       when: item.rowcount != 0
       with_items: "{{ db_table_query.results }}"
 ...

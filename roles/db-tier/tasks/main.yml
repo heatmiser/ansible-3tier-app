@@ -1,25 +1,25 @@
 ---
 # tasks file for db-tier
 - name: install postgres packages
-  yum:
+  ansible.builtin.yum:
     name:
       - postgresql-server
       - python-psycopg2
     state: latest
 
 - name: Check if PostgreSQL database is initialized.
-  stat:
+  ansible.builtin.stat:
     path: "{{ pg_data }}"
   register: pgdata_dir_version
 
 - name: Perform PostgreSQL database initialization if required.
-  command: postgresql-setup initdb
+  ansible.builtin.command: postgresql-setup initdb
   when: not pgdata_dir_version.stat.exists
   notify:
     - restart_postgresql
 
 - name: start PostgreSQL service and enable PostgreSQL to start at boot time
-  service:
+  ansible.builtin.service:
     name: postgresql.service
     enabled: yes
     state: started
@@ -27,7 +27,7 @@
     - restart_postgresql
 
 - name: Confgure PostgreSQL local access
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /var/lib/pgsql/data/pg_hba.conf
     regexp: 'local   all             all'
     line: local   all             all                                  trust
@@ -35,7 +35,7 @@
     - restart_postgresql
 
 - name: Confgure PostgreSQL remote access
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /var/lib/pgsql/data/pg_hba.conf
     regexp: 'host    all             all             127.0.0.1/32            ident'
     line: host    all             all             0.0.0.0/0            md5
@@ -43,7 +43,7 @@
     - restart_postgresql
 
 - name: Configure PostgreSQL service listener address binding
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /var/lib/pgsql/data/postgresql.conf
     regexp: 'listen_addresses ='
     line: listen_addresses = '*'
@@ -51,22 +51,22 @@
     - restart_postgresql
 
 - name: restart PostgreSQL service
-  service:
+  ansible.builtin.service:
     name: postgresql.service
     state: restarted
 
 - name: Create a new database with name "{{ pg_db_name }}"
-  postgresql_db:
+  community.postgresql.postgresql_db:
     name: "{{ pg_db_name }}"
 
 - name: Connect to {{ pg_db_name }} database, create {{ pg_db_user }}, and grant access to database
-  postgresql_user:
+  community.postgresql.postgresql_user:
     db: "{{ pg_db_name }}"
     name: "{{ pg_db_user }}"
     password: "{{ pg_db_passwd }}"
 
 - name: GRANT ALL PRIVILEGES ON DATABASE {{ pg_db_name }} TO {{ pg_db_name }}
-  postgresql_privs:
+  community.postgresql.postgresql_privs:
     db: "{{ pg_db_name }}"
     privs: ALL
     type: database

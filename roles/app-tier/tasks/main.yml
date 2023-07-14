@@ -1,7 +1,7 @@
 ---
 # tasks file for app-tier
 - name: install tomcat packages
-  yum:
+  ansible.builtin.yum:
     name: tomcat
     state: latest
 
@@ -10,20 +10,20 @@
 #    var: hostvars[groups['AnsibleGroup_appdbs'][0]]
 
 - name: Set tomcat_can_network_connect_db flag on and keep it persistent across reboots
-  seboolean:
+  ansible.posix.seboolean:
     name: tomcat_can_network_connect_db
     state: yes
     persistent: yes
 
 - name: create tomcat ROOT directory
-  file:
+  ansible.builtin.file:
     path: "{{ webapps }}/ROOT"
     state: directory
     owner: tomcat
     group: tomcat
 
 - name: copy index.html to tomcat webapps ROOT"
-  template:
+  ansible.builtin.template:
     src: index.html.j2
     dest: "{{ webapps }}/ROOT/index.html"
     mode: 0644
@@ -33,7 +33,7 @@
     - restart_tomcat
 
 - name: Download application war and place in {{ webapps }}
-  get_url:
+  ansible.builtin.get_url:
     url: https://heatmiser-public-02.s3.us-east-2.amazonaws.com/JDBC_PostgreSQL_52.zip
     dest: "{{ webapps }}/3ta.war"
     mode: 0644
@@ -43,7 +43,7 @@
     - restart_tomcat
 
 - name: copy mydb.cfg to tomcat user home dir"
-  template:
+  ansible.builtin.template:
     src: mydb.cfg.j2
     dest: /usr/share/tomcat/mydb.cfg
     mode: 0644
@@ -53,7 +53,7 @@
     - restart_tomcat
 
 - name: start Tomcat service and enable Tomcat to start at boot time
-  service:
+  ansible.builtin.service:
     name: tomcat.service
     enabled: yes
   notify:

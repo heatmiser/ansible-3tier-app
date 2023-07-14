@@ -1,19 +1,19 @@
 ---
 # tasks file for lb-tier
 - name: install HAProxy packages
-  yum:
+  ansible.builtin.yum:
     name: "{{ packages }}"
     state: latest
 
 - name: configure HAProxy from template
-  template:
+  ansible.builtin.template:
     src: haproxy.cfg.j2
     dest: "{{ haproxy_cfg }}"
   notify:
     - restart_haproxy
 
 - name: start HAProxy service and enable HAProxy to start at boot time
-  service:
+  ansible.builtin.service:
     name: haproxy.service
     enabled: yes
   notify:

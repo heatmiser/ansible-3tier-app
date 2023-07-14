@@ -1,6 +1,6 @@
 ---
 # restart tasks file for db-tier
 - name: restart PostgreSQL service
-  service:
+  ansible.builtin.service:
     name: postgresql.service
     state: restarted
