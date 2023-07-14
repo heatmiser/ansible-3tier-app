@@ -56,17 +56,17 @@
     state: restarted
 
 - name: Create a new database with name "{{ pg_db_name }}"
-  community.general.postgresql_db:
+  community.postgresql.postgresql_db:
     name: "{{ pg_db_name }}"
 
 - name: Connect to {{ pg_db_name }} database, create {{ pg_db_user }}, and grant access to database
-  community.general.postgresql_user:
+  community.postgresql.postgresql_user:
     db: "{{ pg_db_name }}"
     name: "{{ pg_db_user }}"
     password: "{{ pg_db_passwd }}"
 
 - name: GRANT ALL PRIVILEGES ON DATABASE {{ pg_db_name }} TO {{ pg_db_name }}
-  community.general.postgresql_privs:
+  community.postgresql.postgresql_privs:
     db: "{{ pg_db_name }}"
     privs: ALL
     type: database
