@@ -20,6 +20,9 @@
         url: "http://{{ hostvars[item]['ansible_nodename'] }}"
         return_content: yes
       register: webpage
+      until: "webpage.status == 200"
+      retries: 12
+      delay: 10
       with_items:
         - "{{ groups['AnsibleGroup_frontends'] }}"
 
