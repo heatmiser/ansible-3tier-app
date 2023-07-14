@@ -19,6 +19,7 @@
       ansible.builtin.uri:
         url: "http://{{ hostvars[item]['ansible_nodename'] }}"
         return_content: yes
+        timeout: 5
       register: webpage
       until: "webpage.status == 200"
       retries: 12
