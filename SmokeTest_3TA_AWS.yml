@@ -22,7 +22,7 @@
         timeout: 5
       register: webpage
       until: "webpage.status == 200"
-      retries: 12
+      retries: 16
       delay: 10
       with_items:
         - "{{ groups['AnsibleGroup_frontends'] }}"
