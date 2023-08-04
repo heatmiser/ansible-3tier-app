@@ -1,9 +1,11 @@
 ---
-
 - name: Deploy PostgreSQL server
   become: true
   hosts: AnsibleGroup_appdbs
   gather_facts: false
+  pre_tasks:
+    - name: Populate service facts
+      ansible.builtin.service_facts:  
   roles:
     - {name: db-tier, tags: [db-tier, dbs, PostgreSQL]}
 
@@ -11,6 +13,9 @@
   become: true
   hosts: AnsibleGroup_apps
   gather_facts: true
+  pre_tasks:
+    - name: Populate service facts
+      ansible.builtin.service_facts:
   roles:
     - {name: app-tier, tags: [app-tier, apps, Tomcat]}
 
@@ -18,7 +23,9 @@
   become: true
   hosts: AnsibleGroup_frontends
   gather_facts: true
+  pre_tasks:
+    - name: Populate service facts
+      ansible.builtin.service_facts:
   roles:
     - {name: lb-tier, haproxy_group: AnsibleGroup_apps, tags: [lb-tier, lbs, HAProxy]}
-
 ...
