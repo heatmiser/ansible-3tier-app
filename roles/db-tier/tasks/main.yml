@@ -74,7 +74,7 @@
 
 - name: Open postgresql port with firewalld
   ansible.posix.firewalld:
-    service: {{ item }}
+    service: "{{ item }}"
     permanent: true
     immediate: true
     state: enabled

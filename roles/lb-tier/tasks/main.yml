@@ -21,7 +21,7 @@
 
 - name: Open haproxy ports with firewalld
   ansible.posix.firewalld:
-    service: {{ item }}
+    service: "{{ item }}"
     permanent: true
     immediate: true
     state: enabled
