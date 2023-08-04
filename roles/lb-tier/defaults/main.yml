@@ -1,2 +1,5 @@
 ---
 # defaults file for lb-tier
+haproxy_firewall_open_ports: [80, 443]
+haproxy_firewall_open_services: ["http", "https"]
+...
