@@ -1,6 +1,6 @@
 ---
 # tasks file for db-tier
-- name: install postgres packages
+- name: Install postgres packages
   ansible.builtin.yum:
     name:
       - postgresql-server
@@ -18,7 +18,7 @@
   notify:
     - restart_postgresql
 
-- name: start PostgreSQL service and enable PostgreSQL to start at boot time
+- name: Start PostgreSQL service and enable PostgreSQL to start at boot time
   ansible.builtin.service:
     name: postgresql.service
     enabled: yes
@@ -50,7 +50,7 @@
   notify:
     - restart_postgresql
 
-- name: restart PostgreSQL service
+- name: Restart PostgreSQL service
   ansible.builtin.service:
     name: postgresql.service
     state: restarted
@@ -71,3 +71,17 @@
     privs: ALL
     type: database
     role: "{{ pg_db_user }}"
+
+- name: Open postgresql port with firewalld
+  ansible.posix.firewalld:
+    service: {{ item }}
+    permanent: true
+    immediate: true
+    state: enabled
+  with_items: "{{postgresql_firewall_open_services}}"
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution_major_version|int >= 7
+    - ansible_facts.services['firewalld.service'].state == 'running'
+    - ansible_facts.services['firewalld.service'].status == 'enabled'
+  tags: firewall
