@@ -2,7 +2,7 @@
 - name: Deploy PostgreSQL server
   become: true
   hosts: AnsibleGroup_appdbs
-  gather_facts: false
+  gather_facts: true
   pre_tasks:
     - name: Populate service facts
       ansible.builtin.service_facts:  
