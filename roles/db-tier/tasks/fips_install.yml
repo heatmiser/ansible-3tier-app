@@ -10,6 +10,7 @@
     name:
       - "postgresql{{ postgresql_version_fips }}"
       - "postgresql{{ postgresql_version_fips }}-server"
+      - python-psycopg2
     state: latest
 
 - name: Check if PostgreSQL database is initialized.
