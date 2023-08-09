@@ -72,6 +72,9 @@
     type: database
     role: "{{ pg_db_user }}"
 
+- ansible.builtin.debug:
+    var: ansible_facts.services
+
 - name: Open postgresql port with firewalld
   ansible.posix.firewalld:
     service: "{{ item }}"
