@@ -56,7 +56,7 @@
   notify:
     - restart_postgresql
 
-#- name: Restart PostgreSQL service
-#  ansible.builtin.service:
-#    name: "postgresql{{ postgresql_version_fips }}.service"
-#    state: restarted
+- name: Restart PostgreSQL service
+  ansible.builtin.service:
+    name: "postgresql-{{ postgresql_version_fips }}.service"
+    state: restarted
