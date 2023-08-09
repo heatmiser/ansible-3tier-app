@@ -1,59 +1,30 @@
 ---
 # tasks file for db-tier
-- name: Install postgres packages
-  ansible.builtin.yum:
-    name:
-      - postgresql-server
-      - python-psycopg2
-    state: latest
 
-- name: Check if PostgreSQL database is initialized.
+- name: Check /etc/system-fips
   ansible.builtin.stat:
-    path: "{{ pg_data }}"
-  register: pgdata_dir_version
+    path: "/etc/system-fips"
+  register: etc_system_fips
 
-- name: Perform PostgreSQL database initialization if required.
-  ansible.builtin.command: postgresql-setup initdb
-  when: not pgdata_dir_version.stat.exists
-  notify:
-    - restart_postgresql
+- name: Check /proc/sys/crypto/fips_enabled
+  ansible.builtin.slurp:
+    src: "/proc/sys/crypto/fips_enabled"
+  register: fips_enabled
 
-- name: Start PostgreSQL service and enable PostgreSQL to start at boot time
-  ansible.builtin.service:
-    name: postgresql.service
-    enabled: yes
-    state: started
-  notify:
-    - restart_postgresql
+- ansible.builtin.set_fact:
+    fips_mode: "{{ fips_enabled.content | b64decode }} | int "
 
-- name: Confgure PostgreSQL local access
-  ansible.builtin.lineinfile:
-    path: /var/lib/pgsql/data/pg_hba.conf
-    regexp: 'local   all             all'
-    line: local   all             all                                  trust
-  notify:
-    - restart_postgresql
+- name: Call FIPS mode install
+  ansible.builtin.include_tasks: fips_install.yml
+  when:
+    - etc_system_fips.stat.exists
+    - fips_mode
 
-- name: Confgure PostgreSQL remote access
-  ansible.builtin.lineinfile:
-    path: /var/lib/pgsql/data/pg_hba.conf
-    regexp: 'host    all             all             127.0.0.1/32            ident'
-    line: host    all             all             0.0.0.0/0            md5
-  notify:
-    - restart_postgresql
-
-- name: Configure PostgreSQL service listener address binding
-  ansible.builtin.lineinfile:
-    path: /var/lib/pgsql/data/postgresql.conf
-    regexp: 'listen_addresses ='
-    line: listen_addresses = '*'
-  notify:
-    - restart_postgresql
-
-- name: Restart PostgreSQL service
-  ansible.builtin.service:
-    name: postgresql.service
-    state: restarted
+- name: Call standard mode install
+  ansible.builtin.include_tasks: standard_install.yml
+  when:
+    - not etc_system_fips.stat.exists
+    - not fips_mode
 
 - name: Create a new database with name "{{ pg_db_name }}"
   community.postgresql.postgresql_db:

@@ -5,4 +5,5 @@ pg_db_user: user01
 pg_db_passwd: Xtr4Sup3rS3cr3tP4ssw0rd?!
 postgresql_firewall_open_ports: [5432]
 postgresql_firewall_open_services: ["postgresql"]
+postgresql_version_fips: "11"
 ...

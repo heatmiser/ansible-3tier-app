@@ -1,0 +1,61 @@
+---
+# tasks file for FIPS db-tier
+- name: Install PostgreSQL EL7 repo rpm
+  ansible.builtin.yum:
+    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    state: present
+
+- name: "Install PostgreSQL {{ postgresql_version_fips }} packages"
+  ansible.builtin.yum:
+    name:
+      - "postgresql{{ postgresql_version_fips }}"
+      - "postgresql{{ postgresql_version_fips }}-server"
+    state: latest
+
+- name: Check if PostgreSQL database is initialized.
+  ansible.builtin.stat:
+    path: "/var/lib/pgsql/{{ postgresql_version_fips }}/data/PG_VERSION"
+  register: pgdata_dir_version
+
+- name: Perform PostgreSQL database initialization if required.
+  ansible.builtin.command: postgresql-setup initdb
+  when: not pgdata_dir_version.stat.exists
+  notify:
+    - restart_postgresql
+
+- name: Start PostgreSQL service and enable PostgreSQL to start at boot time
+  ansible.builtin.service:
+    name: "postgresql{{ postgresql_version_fips }}.service"
+    enabled: yes
+    state: started
+  notify:
+    - restart_postgresql
+
+- name: Confgure PostgreSQL local access
+  ansible.builtin.lineinfile:
+    path: "/var/lib/pgsql/{{ postgresql_version_fips }}/data/pg_hba.conf"
+    regexp: 'local   all             all'
+    line: local   all             all                                  trust
+  notify:
+    - restart_postgresql
+
+- name: Confgure PostgreSQL remote access
+  ansible.builtin.lineinfile:
+    path: "/var/lib/pgsql/{{ postgresql_version_fips }}/data/pg_hba.conf"
+    regexp: 'host    all             all             127.0.0.1/32            ident'
+    line: host    all             all             0.0.0.0/0            scram-sha-256
+  notify:
+    - restart_postgresql
+
+- name: Configure PostgreSQL service listener address binding
+  ansible.builtin.lineinfile:
+    path: "/var/lib/pgsql/{{ postgresql_version_fips }}/data/postgresql.conf"
+    regexp: 'listen_addresses ='
+    line: listen_addresses = '*'
+  notify:
+    - restart_postgresql
+
+#- name: Restart PostgreSQL service
+#  ansible.builtin.service:
+#    name: "postgresql{{ postgresql_version_fips }}.service"
+#    state: restarted
