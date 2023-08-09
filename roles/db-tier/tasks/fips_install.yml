@@ -21,15 +21,15 @@
   ansible.builtin.command: postgresql-setup initdb
   when: not pgdata_dir_version.stat.exists
   notify:
-    - restart_postgresql
+    - restart_postgresql_fips
 
 - name: Start PostgreSQL service and enable PostgreSQL to start at boot time
   ansible.builtin.service:
-    name: "postgresql{{ postgresql_version_fips }}.service"
+    name: "postgresql-{{ postgresql_version_fips }}.service"
     enabled: yes
     state: started
   notify:
-    - restart_postgresql
+    - restart_postgresql_fips
 
 - name: Confgure PostgreSQL local access
   ansible.builtin.lineinfile:
@@ -37,7 +37,7 @@
     regexp: 'local   all             all'
     line: local   all             all                                  trust
   notify:
-    - restart_postgresql
+    - restart_postgresql_fips
 
 - name: Confgure PostgreSQL remote access
   ansible.builtin.lineinfile:
@@ -45,7 +45,7 @@
     regexp: 'host    all             all             127.0.0.1/32            ident'
     line: host    all             all             0.0.0.0/0            scram-sha-256
   notify:
-    - restart_postgresql
+    - restart_postgresql_fips
 
 - name: Configure PostgreSQL service listener address binding
   ansible.builtin.lineinfile:

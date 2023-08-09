@@ -2,20 +2,40 @@
 # handlers file for db-tier
 - name: start_postgresql
   ansible.builtin.service:
-    name: "postgresql{{ postgresql_version_fips }}.service"
+    name: "postgresql.service"
     state: started
 
 - name: stop_postgresql
   ansible.builtin.service:
-    name: "postgresql{{ postgresql_version_fips }}.service"
+    name: "postgresql.service"
     state: stopped
 
 - name: reload_postgresql
   ansible.builtin.service:
-    name: "postgresql{{ postgresql_version_fips }}.service"
+    name: "postgresql.service"
     state: reloaded
 
 - name: restart_postgresql
   ansible.builtin.service:
-    name: "postgresql{{ postgresql_version_fips }}.service"
+    name: "postgresql.service"
+    state: restarted
+
+- name: start_postgresql_fips
+  ansible.builtin.service:
+    name: "postgresql-{{ postgresql_version_fips }}.service"
+    state: started
+
+- name: stop_postgresql_fips
+  ansible.builtin.service:
+    name: "postgresql-{{ postgresql_version_fips }}.service"
+    state: stopped
+
+- name: reload_postgresql_fips
+  ansible.builtin.service:
+    name: "postgresql-{{ postgresql_version_fips }}.service"
+    state: reloaded
+
+- name: restart_postgresql_fips
+  ansible.builtin.service:
+    name: "postgresql-{{ postgresql_version_fips }}.service"
     state: restarted
