@@ -14,6 +14,9 @@
 - ansible.builtin.set_fact:
     fips_mode: "{{ fips_enabled.content | b64decode | int }}"
 
+- debug:
+    var: fips_mode
+
 - name: Call FIPS mode install
   ansible.builtin.include_tasks: fips_install.yml
   when:
