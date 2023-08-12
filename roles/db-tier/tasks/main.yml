@@ -11,11 +11,8 @@
     src: "/proc/sys/crypto/fips_enabled"
   register: fips_enabled
 
-- debug:
-    msg: "{{ fips_enabled.content | b64decode }}"
-
 - ansible.builtin.set_fact:
-    fips_mode: "{{ fips_enabled.content | b64decode }} | int "
+    fips_mode: "{{ fips_enabled.content | b64decode | int }}"
 
 - name: Call FIPS mode install
   ansible.builtin.include_tasks: fips_install.yml
