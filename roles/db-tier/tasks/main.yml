@@ -27,7 +27,7 @@
   ansible.builtin.include_tasks: standard_install.yml
   when:
     #- not etc_system_fips.stat.exists
-    - fips_mode == 0
+    - fips_mode | int == 0
 
 - name: Create a new database with name "{{ pg_db_name }}"
   community.postgresql.postgresql_db:
