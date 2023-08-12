@@ -18,13 +18,13 @@
   ansible.builtin.include_tasks: fips_install.yml
   when:
     - etc_system_fips.stat.exists
-    - fips_mode
+    - fips_mode == 1
 
 - name: Call standard mode install
   ansible.builtin.include_tasks: standard_install.yml
   when:
     - not etc_system_fips.stat.exists
-    - not fips_mode
+    - fips_mode == 0
 
 - name: Create a new database with name "{{ pg_db_name }}"
   community.postgresql.postgresql_db:
