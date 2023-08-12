@@ -26,7 +26,7 @@
 - name: Call standard mode install
   ansible.builtin.include_tasks: standard_install.yml
   when:
-    - not etc_system_fips.stat.exists
+    #- not etc_system_fips.stat.exists
     - fips_mode == 0
 
 - name: Create a new database with name "{{ pg_db_name }}"
