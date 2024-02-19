@@ -82,6 +82,8 @@
     immediate: true
     state: enabled
   with_items: "{{postgresql_firewall_open_services}}"
+  vars:
+    ansible_python_interpreter: /usr/bin/python2.7
   when:
     - ansible_os_family == 'RedHat'
     - ansible_distribution_major_version|int >= 7
