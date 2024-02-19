@@ -14,6 +14,8 @@
     name: tomcat_can_network_connect_db
     state: yes
     persistent: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python2.7
 
 - name: create tomcat ROOT directory
   ansible.builtin.file:
@@ -66,6 +68,8 @@
     immediate: true
     state: enabled
   with_items: "{{tomcat_firewall_open_ports}}"
+  vars:
+    ansible_python_interpreter: /usr/bin/python2.7
   when:
     - ansible_os_family == 'RedHat'
     - ansible_distribution_major_version|int >= 7
