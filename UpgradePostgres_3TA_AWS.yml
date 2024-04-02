@@ -1,0 +1,12 @@
+---
+- name: Upgrade PostgreSQL server
+  become: true
+  hosts: AnsibleGroup_appdbs
+  gather_facts: true
+  pre_tasks:
+    - name: Populate service facts
+      ansible.builtin.service_facts:  
+  tasks:
+    - ansible.builtin.include_role: db-tier
+      tasks_from: __upgrade.yml
+...
