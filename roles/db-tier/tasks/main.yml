@@ -26,29 +26,7 @@
   notify:
     - restart_postgresql
 
-- name: Confgure PostgreSQL local access
-  ansible.builtin.lineinfile:
-    path: /var/lib/pgsql/data/pg_hba.conf
-    regexp: 'local   all             all'
-    line: local   all             all                                  trust
-  notify:
-    - restart_postgresql
-
-- name: Confgure PostgreSQL remote access
-  ansible.builtin.lineinfile:
-    path: /var/lib/pgsql/data/pg_hba.conf
-    regexp: 'host    all             all             127.0.0.1/32            ident'
-    line: host    all             all             0.0.0.0/0            md5
-  notify:
-    - restart_postgresql
-
-- name: Configure PostgreSQL service listener address binding
-  ansible.builtin.lineinfile:
-    path: /var/lib/pgsql/data/postgresql.conf
-    regexp: 'listen_addresses ='
-    line: listen_addresses = '*'
-  notify:
-    - restart_postgresql
+- ansible.builtin.include_tasks: access_cfg.yml
 
 - name: Restart PostgreSQL service
   ansible.builtin.service:
@@ -90,3 +68,4 @@
     - ansible_facts.services['firewalld.service'] is defined and ansible_facts.services['firewalld.service'].state == 'running'
     - ansible_facts.services['firewalld.service'] is defined and ansible_facts.services['firewalld.service'].status == 'enabled'
   tags: firewall
+...
