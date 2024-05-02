@@ -7,6 +7,8 @@
     - name: Populate service facts
       ansible.builtin.service_facts:  
   tasks:
-    - ansible.builtin.include_role: db-tier
-      tasks_from: __upgrade.yml
+    - name: Call __upgrade.yml from db-tier role
+      ansible.builtin.import_role:
+        name: db-tier
+        tasks_from: __upgrade.yml
 ...
