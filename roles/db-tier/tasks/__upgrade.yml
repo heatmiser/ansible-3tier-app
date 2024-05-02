@@ -4,7 +4,7 @@
   ansible.builtin.yum:
     name:
       - postgresql-server
-      - python-psycopg2
+      - python2-psycopg2
       - postgresql-upgrade
     state: latest
 
