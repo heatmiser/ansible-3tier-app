@@ -37,8 +37,6 @@
     name: postgresql.service
     enabled: yes
     state: started
-  notify:
-    - restart_postgresql
 
 - ansible.builtin.include_tasks: access_cfg.yml
 
