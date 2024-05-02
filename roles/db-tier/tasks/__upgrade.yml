@@ -17,7 +17,7 @@
   ansible.builtin.command: systemctl status postgresql
   when: pgdata_dir_version.stat.exists
   register: postgresql_server_status
-  failed_when: ( postgresql_server_status.rc not in [ 0, 3 ]
+  failed_when: postgresql_server_status.rc not in [ 0, 3 ]
 
 - name: Perform PostgreSQL database upgrade if required.
   ansible.builtin.command: postgresql-setup --upgrade
