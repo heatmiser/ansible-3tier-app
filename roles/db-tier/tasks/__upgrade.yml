@@ -13,24 +13,24 @@
     path: "{{ pg_data }}"
   register: pgdata_dir_version
 
-# - name: Check if PostgreSQL database upgrade is required.
-#   ansible.builtin.command: systemctl status postgresql
-#   when: pgdata_dir_version.stat.exists
-#   register: postgresql_server_status
+- name: Check if PostgreSQL database upgrade is required.
+  ansible.builtin.command: systemctl status postgresql
+  when: pgdata_dir_version.stat.exists
+  register: postgresql_server_status
 
-# - name: Perform PostgreSQL database upgrade if required.
-#   ansible.builtin.command: postgresql-setup --upgrade
-#   when:
-#     - pgdata_dir_version.stat.exists
-#     - '"upgrade" in postgresql_server_status.stdout'
-#   register: postgresql_server_upgrade
+- name: Perform PostgreSQL database upgrade if required.
+  ansible.builtin.command: postgresql-setup --upgrade
+  when:
+    - pgdata_dir_version.stat.exists
+    - '"upgrade" in postgresql_server_status.stdout'
+  register: postgresql_server_upgrade
 
-# - name: Verify PostgreSQL database upgrade successful.
-#   ansible.builtin.assert:
-#     that:
-#       - '"Upgraded OK" in postgresql_server_upgrade.stdout'
-#     fail_msg: "PostgreSQL database upgrade unsuccessful, review logs."
-#     success_msg: "PostgreSQL database upgrade successful, continue..."
+- name: Verify PostgreSQL database upgrade successful.
+  ansible.builtin.assert:
+    that:
+      - '"Upgraded OK" in postgresql_server_upgrade.stdout'
+    fail_msg: "PostgreSQL database upgrade unsuccessful, review logs."
+    success_msg: "PostgreSQL database upgrade successful, continue..."
 
 - name: Start PostgreSQL service and enable PostgreSQL to start at boot time
   ansible.builtin.service:
