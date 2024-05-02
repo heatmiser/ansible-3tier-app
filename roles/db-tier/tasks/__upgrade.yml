@@ -29,7 +29,7 @@
 - name: Verify PostgreSQL database upgrade successful.
   ansible.builtin.assert:
     that:
-      - '"Upgraded OK" in postgresql_server_upgrade.stdout'
+      - '"Upgraded OK" in postgresql_server_upgrade.stderr'
     fail_msg: "PostgreSQL database upgrade unsuccessful, review logs."
     success_msg: "PostgreSQL database upgrade successful, continue..."
 
