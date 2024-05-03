@@ -9,7 +9,7 @@
 
 - name: Check if PostgreSQL database is initialized.
   ansible.builtin.stat:
-    path: "{{ pg_data }}"
+    path: "{{ postgresql_data }}"
   register: pgdata_dir_version
 
 - name: Perform PostgreSQL database initialization if required.

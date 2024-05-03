@@ -1,0 +1,9 @@
+---
+# tasks file for db-tier upgrade to PostgreSQL 10
+- name: Install postgres packages
+  ansible.builtin.yum:
+    name: "{{ postgresql_packages }}"
+    state: latest
+
+- ansible.builtin.include_tasks: shared_upgrade_tasks.yml
+...

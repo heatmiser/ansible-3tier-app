@@ -1,18 +1,4 @@
 ---
-# tasks file for db-tier upgrade
-- name: Install postgres packages
-  ansible.builtin.yum:
-    name:
-      - postgresql-server
-      - python3-psycopg2
-      - postgresql-upgrade
-    state: latest
-
-- name: Check if PostgreSQL database is initialized.
-  ansible.builtin.stat:
-    path: "{{ pg_data }}"
-  register: pgdata_dir_version
-
 - name: Check if PostgreSQL database upgrade is required.
   ansible.builtin.command: systemctl status postgresql
   when: pgdata_dir_version.stat.exists
