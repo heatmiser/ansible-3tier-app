@@ -29,9 +29,12 @@
       failed_when: postgresql_server_status.rc not in [ 0, 3 ]
 
     - name: Call __upgrade_version from db-tier role
-      when:
-        - postgresql_target_stream | int >= postgresql_current_stream | int
-        - postgresql_server_status.rc == 3
+      when: >
+        ( postgresql_target_stream | int >= postgresql_current_stream | int and
+        postgresql_server_status.rc == 3 )
+        or
+        ( postgresql_target_stream | int > postgresql_current_stream | int and
+        postgresql_server_status.rc == 0 )        
       ansible.builtin.import_role:
         name: db-tier
         tasks_from: __upgrade_{{ postgresql_target_stream }}.yml
