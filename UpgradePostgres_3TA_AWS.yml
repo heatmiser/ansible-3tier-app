@@ -22,8 +22,16 @@
       ansible.builtin.set_fact:
         postgresql_current_stream: "{{ lookup( 'ini', 'stream section={{ postgresql_module_name }} file=/tmp/ansible/{{ inventory_hostname }}/etc/dnf/modules.d/{{ postgresql_module_name }}.module' ) }}"
 
+    - name: Check if PostgreSQL database upgrade is required.
+      ansible.builtin.command: systemctl status postgresql
+      when: pgdata_dir_version.stat.exists
+      register: postgresql_server_status
+      failed_when: postgresql_server_status.rc not in [ 0, 3 ]
+
     - name: Call __upgrade_version from db-tier role
-      when: postgresql_target_stream | int >= postgresql_current_stream | int 
+      when:
+        - postgresql_target_stream | int >= postgresql_current_stream | int
+        - postgresql_server_status.rc == 3
       ansible.builtin.import_role:
         name: db-tier
         tasks_from: __upgrade_{{ postgresql_target_stream }}.yml

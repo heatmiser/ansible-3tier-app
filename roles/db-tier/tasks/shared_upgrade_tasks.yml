@@ -1,15 +1,9 @@
 ---
-- name: Check if PostgreSQL database upgrade is required.
-  ansible.builtin.command: systemctl status postgresql
-  when: pgdata_dir_version.stat.exists
-  register: postgresql_server_status
-  failed_when: postgresql_server_status.rc not in [ 0, 3 ]
-
 - name: Perform PostgreSQL database upgrade if required.
   ansible.builtin.command: postgresql-setup --upgrade
   when:
     - pgdata_dir_version.stat.exists
-    - '"upgrade" in postgresql_server_status.stdout'
+    - '"postgresql-setup --upgrade" in postgresql_server_status.stdout'
   register: postgresql_server_upgrade
 
 - name: Verify PostgreSQL database upgrade successful.
