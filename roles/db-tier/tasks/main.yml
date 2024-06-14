@@ -1,21 +1,71 @@
 ---
-
-- name: install postgres packages
-  yum:
-    name: postgresql-server
+# tasks file for db-tier
+- name: Install postgres packages
+  ansible.builtin.yum:
+    name:
+      - postgresql-server
+      - python-psycopg2
     state: latest
+
 - name: Check if PostgreSQL database is initialized.
-  stat:
-    path: "{{ pg_data }}"
+  ansible.builtin.stat:
+    path: "{{ postgresql_data }}"
   register: pgdata_dir_version
+
 - name: Perform PostgreSQL database initialization if required.
-  command: postgresql-setup initdb
+  ansible.builtin.command: postgresql-setup initdb
   when: not pgdata_dir_version.stat.exists
   notify:
     - restart_postgresql
-- name: start PostgreSQL service and enable PostgreSQL to start at boot time
-  service:
+
+- name: Start PostgreSQL service and enable PostgreSQL to start at boot time
+  ansible.builtin.service:
     name: postgresql.service
     enabled: yes
+    state: started
   notify:
     - restart_postgresql
+
+- ansible.builtin.include_tasks: access_cfg.yml
+
+- name: Restart PostgreSQL service
+  ansible.builtin.service:
+    name: postgresql.service
+    state: restarted
+
+- name: Create a new database with name "{{ pg_db_name }}"
+  community.postgresql.postgresql_db:
+    name: "{{ pg_db_name }}"
+
+- name: Connect to {{ pg_db_name }} database, create {{ pg_db_user }}, and grant access to database
+  community.postgresql.postgresql_user:
+    db: "{{ pg_db_name }}"
+    name: "{{ pg_db_user }}"
+    password: "{{ pg_db_passwd }}"
+
+- name: GRANT ALL PRIVILEGES ON DATABASE {{ pg_db_name }} TO {{ pg_db_name }}
+  community.postgresql.postgresql_privs:
+    db: "{{ pg_db_name }}"
+    privs: ALL
+    type: database
+    role: "{{ pg_db_user }}"
+
+- ansible.builtin.debug:
+    var: ansible_facts.services
+
+- name: Open postgresql port with firewalld
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  with_items: "{{postgresql_firewall_open_services}}"
+  vars:
+    ansible_python_interpreter: /usr/bin/python2.7
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution_major_version|int >= 7
+    - ansible_facts.services['firewalld.service'] is defined and ansible_facts.services['firewalld.service'].state == 'running'
+    - ansible_facts.services['firewalld.service'] is defined and ansible_facts.services['firewalld.service'].status == 'enabled'
+  tags: firewall
+...

@@ -1,3 +1,10 @@
 ---
 # vars file for db-tier
-pg_data: /var/lib/pgsql/data/PG_VERSION
+postgresql_data: /var/lib/pgsql/data/PG_VERSION
+postgresql_target_stream: ''
+postgresql_module_name: "postgresql"
+postgresql_packages:
+  - postgresql-server
+  - python3-psycopg2
+  - postgresql-upgrade
+...

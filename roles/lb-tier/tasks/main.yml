@@ -1,19 +1,36 @@
 ---
-
-# tasks file for good-ansible
+# tasks file for lb-tier
 - name: install HAProxy packages
-  yum:
+  ansible.builtin.yum:
     name: "{{ packages }}"
     state: latest
+
 - name: configure HAProxy from template
-  template:
+  ansible.builtin.template:
     src: haproxy.cfg.j2
     dest: "{{ haproxy_cfg }}"
   notify:
     - restart_haproxy
+
 - name: start HAProxy service and enable HAProxy to start at boot time
-  service:
+  ansible.builtin.service:
     name: haproxy.service
     enabled: yes
   notify:
     - restart_haproxy
+
+- name: Open haproxy ports with firewalld
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  with_items: "{{haproxy_firewall_open_services}}"
+  vars:
+    ansible_python_interpreter: /usr/bin/python2.7
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution_major_version|int >= 7
+    - ansible_facts.services['firewalld.service'] is defined and ansible_facts.services['firewalld.service'].state == 'running'
+    - ansible_facts.services['firewalld.service'] is defined and ansible_facts.services['firewalld.service'].status == 'enabled'
+  tags: firewall

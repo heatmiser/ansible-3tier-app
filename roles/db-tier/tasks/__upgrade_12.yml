@@ -1,0 +1,25 @@
+---
+# tasks file for db-tier upgrade to PostgreSQL 12
+- name: Provide debug info
+  ansible.builtin.debug:
+    var: pgdata_dir_version
+
+- name: Stop PostgreSQL service
+  ansible.builtin.service:
+    name: postgresql.service
+    state: stopped
+
+- name: Reset {{ postgresql_module_name }} module
+  ansible.builtin.command: "dnf module reset -y {{ postgresql_module_name }}"
+  register:
+    postgresql_stream_reset
+
+- name: "Install {{ postgresql_module_name }}:{{ postgresql_target_stream }} module"
+  ansible.builtin.dnf:
+    name: '@{{ postgresql_module_name }}:{{ postgresql_target_stream }}'
+    state: present
+  register:
+    postgresql_stream_install
+
+- ansible.builtin.include_tasks: shared_upgrade_tasks.yml
+...

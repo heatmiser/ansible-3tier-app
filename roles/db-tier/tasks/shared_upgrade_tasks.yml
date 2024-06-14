@@ -1,0 +1,63 @@
+---
+- name: Perform PostgreSQL database upgrade if required.
+  ansible.builtin.command: postgresql-setup --upgrade
+  when: >
+    ( pgdata_dir_version.stat.exists and
+    '"postgresql-setup --upgrade" in postgresql_server_status.stdout' )
+    or
+    ( postgresql_target_stream | int > postgresql_current_stream | int and
+    postgresql_server_status.rc == 0 and
+    '"Complete" in postgresql_stream_reset.stdout' and
+    '"installed" in postgresql_stream_install.results' and
+    postgresql_stream_install.rc == 0 )
+  register: postgresql_server_upgrade
+
+- name: Verify PostgreSQL database upgrade successful.
+  ansible.builtin.assert:
+    that:
+      - '"Upgraded OK" in postgresql_server_upgrade.stderr'
+    fail_msg: "PostgreSQL database upgrade unsuccessful, review logs."
+    success_msg: "PostgreSQL database upgrade successful, continue..."
+
+- name: Start PostgreSQL service and enable PostgreSQL to start at boot time
+  ansible.builtin.service:
+    name: postgresql.service
+    enabled: yes
+    state: started
+
+- ansible.builtin.include_tasks: access_cfg.yml
+
+- name: Reindex PostgreSQL databases.
+  ansible.builtin.command: reindexdb -a
+  become: true
+  become_user: postgres
+  register: postgresql_db_reindex
+
+- name: Verify PostgreSQL database reindexing successful.
+  ansible.builtin.assert:
+    that:
+      - '"reindexing database \"db01\"" in postgresql_db_reindex.stdout'
+      - '"reindexing database \"postgres\"" in postgresql_db_reindex.stdout'
+      - '"reindexing database \"template1\"" in postgresql_db_reindex.stdout'
+    fail_msg: "PostgreSQL database reindexing unsuccessful, review logs."
+    success_msg: "PostgreSQL database reindexing successful, continue..."
+
+- ansible.builtin.debug:
+    var: ansible_facts.services
+
+- name: Open postgresql port with firewalld
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  with_items: "{{postgresql_firewall_open_services}}"
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution_major_version|int >= 8
+    - ansible_facts.services['firewalld.service'] is defined and ansible_facts.services['firewalld.service'].state == 'running'
+    - ansible_facts.services['firewalld.service'] is defined and ansible_facts.services['firewalld.service'].status == 'enabled'
+  tags: firewall
+...

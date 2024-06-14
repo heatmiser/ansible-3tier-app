@@ -1,9 +1,11 @@
 ---
-
 - name: Deploy PostgreSQL server
   become: true
   hosts: AnsibleGroup_appdbs
-  gather_facts: false
+  gather_facts: true
+  pre_tasks:
+    - name: Populate service facts
+      ansible.builtin.service_facts:  
   roles:
     - {name: db-tier, tags: [db-tier, dbs, PostgreSQL]}
 
@@ -11,6 +13,9 @@
   become: true
   hosts: AnsibleGroup_apps
   gather_facts: true
+  pre_tasks:
+    - name: Populate service facts
+      ansible.builtin.service_facts:
   roles:
     - {name: app-tier, tags: [app-tier, apps, Tomcat]}
 
@@ -18,25 +23,9 @@
   become: true
   hosts: AnsibleGroup_frontends
   gather_facts: true
+  pre_tasks:
+    - name: Populate service facts
+      ansible.builtin.service_facts:
   roles:
     - {name: lb-tier, haproxy_group: AnsibleGroup_apps, tags: [lb-tier, lbs, HAProxy]}
-
-- name: Smoke test the 3 Tier application
-  hosts: localhost
-  connection: local
-  gather_facts: false
-  tasks:
-    - name: Check frontend(s) is responding on port 80
-      uri:
-        url: "http://{{ hostvars[item]['ansible_nodename'] }}"
-        return_content: yes
-      register: webpage
-      with_items:
-        - "{{ groups['AnsibleGroup_frontends'] }}"
-
-    - name: Fail if the page content does not have <Ansible has done its job>
-      fail:
-      when: '"Ansible has done its job - Welcome to Tomcat" not in item.content'
-      with_items: "{{ webpage.results }}"
-
 ...

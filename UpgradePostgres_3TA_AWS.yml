@@ -1,0 +1,41 @@
+---
+- name: Upgrade PostgreSQL server
+  become: true
+  hosts: AnsibleGroup_appdbs
+  gather_facts: true
+  pre_tasks:
+    - name: Populate service facts
+      ansible.builtin.service_facts:  
+  tasks:
+    - name: Check if PostgreSQL database is initialized
+      ansible.builtin.stat:
+        path: "{{ postgresql_data }}"
+      register: pgdata_dir_version
+
+    - name: Retrieve remote postgresql module ini
+      ansible.builtin.fetch:
+        src: "/etc/dnf/modules.d/{{ postgresql_module_name }}.module"
+        dest: /tmp/ansible
+      changed_when: false
+      
+    - name: "Read stream from {{ postgresql_module_name }} module ini"
+      ansible.builtin.set_fact:
+        postgresql_current_stream: "{{ lookup( 'ini', 'stream section={{ postgresql_module_name }} file=/tmp/ansible/{{ inventory_hostname }}/etc/dnf/modules.d/{{ postgresql_module_name }}.module' ) }}"
+
+    - name: Check if PostgreSQL database upgrade is required.
+      ansible.builtin.command: systemctl status postgresql
+      when: pgdata_dir_version.stat.exists
+      register: postgresql_server_status
+      failed_when: postgresql_server_status.rc not in [ 0, 3 ]
+
+    - name: Call __upgrade_version from db-tier role
+      when: >
+        ( postgresql_target_stream | int >= postgresql_current_stream | int and
+        postgresql_server_status.rc == 3 )
+        or
+        ( postgresql_target_stream | int > postgresql_current_stream | int and
+        postgresql_server_status.rc == 0 )        
+      ansible.builtin.import_role:
+        name: db-tier
+        tasks_from: __upgrade_{{ postgresql_target_stream }}.yml
+...

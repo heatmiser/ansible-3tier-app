@@ -1,6 +1,21 @@
 ---
-# handlers file for good-ansible
+# handlers file for lb-tier
+- name: start_haproxy
+  ansible.builtin.service:
+    name: haproxy.service
+    state: started
+
+- name: stop_haproxy
+  ansible.builtin.service:
+    name: haproxy.service
+    state: stopped
+
+- name: reload_haproxy
+  ansible.builtin.service:
+    name: haproxy.service
+    state: reloaded
+
 - name: restart_haproxy
-  service:
+  ansible.builtin.service:
     name: haproxy.service
     state: restarted
