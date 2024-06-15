@@ -40,8 +40,11 @@
       with_items:
         - "{{ groups['AnsibleGroup_frontends'] }}"
 
+    - ansible.builtin.debug:
+        var: threetierpage
+
     - ansible.builtin.set_fact:
-        smoke_test_table: "{{ threetierpage.results.content[item] | replace('\n','') | regex_replace('.*Table \\\"', '') | regex_replace('\\\" has been created.*$', '') }}"
+        smoke_test_table: "{{ threetierpage.results.content | replace('\n','') | regex_replace('.*Table \\\"', '') | regex_replace('\\\" has been created.*$', '') }}"
       with_items:
         - "{{ groups['AnsibleGroup_frontends'] }}"
 
