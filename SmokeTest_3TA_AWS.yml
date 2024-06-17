@@ -2,13 +2,21 @@
 
 - name: Facts from PostgreSQL server
   become: true
-  hosts: AnsibleGroup_appdbs
+  hosts: "{{ app_stack_name }}_appdbs"
   gather_facts: true
+  pre_tasks:
+    - name: Create AnsibleGroup_appdbs group alias
+      ansible.builtin.group_by:
+        key: AnsibleGroup_appdbs
 
 - name: Facts from load balancer servers
   become: true
-  hosts: AnsibleGroup_frontends
+  hosts: "{{ app_stack_name }}_frontends"
   gather_facts: true
+  pre_tasks:
+    - name: Create AnsibleGroup_frontends group alias
+      ansible.builtin.group_by:
+        key: AnsibleGroup_frontends
 
 - name: Smoke test the 3 Tier application
   hosts: localhost
