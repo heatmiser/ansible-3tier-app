@@ -17,6 +17,8 @@
   become: true
   hosts: "{{ app_stack_name }}_apps"
   gather_facts: true
+  vars:
+    AnsibleGroup_appdbs: "{{ app_stack_name }}_appdbs"
   pre_tasks:
     - name: Populate service facts
       ansible.builtin.service_facts:
