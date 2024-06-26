@@ -2,13 +2,21 @@
 
 - name: Facts from PostgreSQL server
   become: true
-  hosts: AnsibleGroup_appdbs
+  hosts: "{{ app_stack_name }}_appdbs"
   gather_facts: true
+  pre_tasks:
+    - name: Create AnsibleGroup_appdbs group alias
+      ansible.builtin.group_by:
+        key: AnsibleGroup_appdbs
 
 - name: Facts from load balancer servers
   become: true
-  hosts: AnsibleGroup_frontends
+  hosts: "{{ app_stack_name }}_frontends"
   gather_facts: true
+  pre_tasks:
+    - name: Create AnsibleGroup_frontends group alias
+      ansible.builtin.group_by:
+        key: AnsibleGroup_frontends
 
 - name: Smoke test the 3 Tier application
   hosts: localhost
@@ -41,10 +49,9 @@
         - "{{ groups['AnsibleGroup_frontends'] }}"
 
     - ansible.builtin.set_fact:
-        smoke_test_table: "{{ threetierpage.results[0].content | replace('\n','') | regex_replace('.*Table \\\"', '') | regex_replace('\\\" has been created.*$', '') }}"
-
-    - ansible.builtin.debug:
-        var: smoke_test_table
+        smoke_test_table: "{{ item.content | replace('\n','') | regex_replace('.*Table \\\"', '') | regex_replace('\\\" has been created.*$', '') }}"
+      with_items:
+        - "{{ threetierpage.results }}"
 
     - name: Fail if the page content does not have "Please check the DB manually"
       ansible.builtin.fail:
@@ -61,9 +68,6 @@
       with_items:
         - "{{ groups['AnsibleGroup_appdbs'] }}"
       register: db_table_query
-
-    - ansible.builtin.debug:
-        var: db_table_query
 
     - name: Fail if database {{ pg_db_name }} did not contain table {{ smoke_test_table }}  
       ansible.builtin.fail:
