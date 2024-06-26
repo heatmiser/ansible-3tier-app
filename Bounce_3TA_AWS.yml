@@ -1,7 +1,7 @@
 ---
 - name: Stop load balancer servers
   become: true
-  hosts: AnsibleGroup_frontends
+  hosts: "{{ app_stack_name }}_frontends"
   gather_facts: false
   tasks:
     - name: Stop HAProxy service
@@ -11,7 +11,7 @@
 
 - name: Stop application servers
   become: true
-  hosts: AnsibleGroup_apps
+  hosts: "{{ app_stack_name }}_apps"
   gather_facts: false
   tasks:
     - name: Stop Tomcat service
@@ -21,7 +21,7 @@
 
 - name: Restart PostgreSQL service
   become: true
-  hosts: AnsibleGroup_appdbs
+  hosts: "{{ app_stack_name }}_appdbs"
   gather_facts: false
   tasks:
     - name: Restart PostgreSQL service
@@ -31,7 +31,7 @@
 
 - name: Start application servers
   become: true
-  hosts: AnsibleGroup_apps
+  hosts: "{{ app_stack_name }}_apps"
   gather_facts: false
   tasks:
     - name: Start Tomcat service
@@ -41,7 +41,7 @@
 
 - name: Start load balancer servers
   become: true
-  hosts: AnsibleGroup_frontends
+  hosts: "{{ app_stack_name }}_frontends"
   gather_facts: false
   tasks:
     - name: Start HAProxy service
