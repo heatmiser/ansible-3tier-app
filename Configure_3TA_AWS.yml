@@ -1,31 +1,47 @@
 ---
 - name: Deploy PostgreSQL server
   become: true
-  hosts: AnsibleGroup_appdbs
+  hosts: "{{ app_stack_name }}_appdbs"
   gather_facts: true
   pre_tasks:
     - name: Populate service facts
-      ansible.builtin.service_facts:  
+      ansible.builtin.service_facts:
+    - name: Create AnsibleGroup_appdbs group alias
+      ansible.builtin.group_by:
+        key: AnsibleGroup_appdbs
   roles:
-    - {name: db-tier, tags: [db-tier, dbs, PostgreSQL]}
+    - name: db-tier
+      tags:
+        - db-tier
+        - dbs
+        - PostgreSQL
 
 - name: Deploy application servers
   become: true
-  hosts: AnsibleGroup_apps
+  hosts: "{{ app_stack_name }}_apps"
   gather_facts: true
   pre_tasks:
     - name: Populate service facts
       ansible.builtin.service_facts:
   roles:
-    - {name: app-tier, tags: [app-tier, apps, Tomcat]}
+    - name: app-tier
+      tags:
+        - app-tier
+        - apps
+        - Tomcat
 
 - name: Deploy load balancer servers
   become: true
-  hosts: AnsibleGroup_frontends
+  hosts: "{{ app_stack_name }}_frontends"
   gather_facts: true
   pre_tasks:
     - name: Populate service facts
       ansible.builtin.service_facts:
   roles:
-    - {name: lb-tier, haproxy_group: AnsibleGroup_apps, tags: [lb-tier, lbs, HAProxy]}
+    - name: lb-tier
+      haproxy_group: "{{ app_stack_name }}_apps"
+      tags:
+        - lb-tier
+        - lbs
+        - HAProxy
 ...
