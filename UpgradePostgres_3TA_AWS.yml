@@ -1,7 +1,7 @@
 ---
 - name: Upgrade PostgreSQL server
   become: true
-  hosts: AnsibleGroup_appdbs
+  hosts: "{{ app_stack_name }}_appdbs"
   gather_facts: true
   pre_tasks:
     - name: Populate service facts
