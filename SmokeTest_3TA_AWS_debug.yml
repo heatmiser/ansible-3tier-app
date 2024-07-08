@@ -1,0 +1,87 @@
+---
+
+- name: Facts from PostgreSQL server
+  become: true
+  hosts: "{{ app_stack_name }}_appdbs"
+  gather_facts: true
+  pre_tasks:
+    - name: Create AnsibleGroup_appdbs group alias
+      ansible.builtin.group_by:
+        key: AnsibleGroup_appdbs
+
+- name: Facts from load balancer servers
+  become: true
+  hosts: "{{ app_stack_name }}_frontends"
+  gather_facts: true
+  pre_tasks:
+    - name: Create AnsibleGroup_frontends group alias
+      ansible.builtin.group_by:
+        key: AnsibleGroup_frontends
+
+- name: Smoke test the 3 Tier application
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Check frontend(s) is responding on port 80
+      ansible.builtin.uri:
+        url: "http://{{ hostvars[item]['ansible_nodename'] }}"
+        return_content: yes
+        timeout: 5
+      register: webpage
+      until: "webpage.status == 200"
+      retries: 16
+      delay: 10
+      with_items:
+        - "{{ groups['AnsibleGroup_frontends'] }}"
+
+    - name: Fail if the page content does not have <Ansible has done its job>
+      ansible.builtin.fail:
+      when: '"Ansible has done its job - Welcome to Tomcat" not in item.content'
+      with_items: "{{ webpage.results }}"
+
+    - name: Check 3ta app frontend is working
+      ansible.builtin.uri:
+        url: "http://{{ hostvars[item]['ansible_nodename'] }}/3ta/connectordbbservlet?"
+        return_content: yes
+      register: threetierpage
+      with_items:
+        - "{{ groups['AnsibleGroup_frontends'] }}"
+
+    - ansible.builtin.debug:
+        var: threetierpage
+
+    - ansible.builtin.set_fact:
+        smoke_test_table: "{{ item.content | replace('\n','') | regex_replace('.*Table \\\"', '') | regex_replace('\\\" has been created.*$', '') }}"
+      with_items:
+        - "{{ threetierpage.results }}"
+
+    - ansible.builtin.debug:
+        var: smoke_test_table 
+
+    - name: Fail if the page content does not have "Please check the DB manually"
+      ansible.builtin.fail:
+      when: '"Please check the DB manually" not in item.content'
+      with_items: "{{ threetierpage.results }}"
+
+    - name: query database {{ pg_db_name }} for newly created table {{ smoke_test_table }}
+      community.postgresql.postgresql_query:
+        login_host: "{{ hostvars[item]['ansible_nodename'] }}"
+        db: "{{ pg_db_name }}"
+        login_user: "{{ pg_db_user }}"
+        login_password: "{{ pg_db_passwd }}"
+        query: "SELECT * FROM \"{{ smoke_test_table }}\""
+      with_items:
+        - "{{ groups['AnsibleGroup_appdbs'] }}"
+      register: db_table_query
+
+    - ansible.builtin.debug:
+        var: db_table_query
+      with_items:
+        - "{{ groups['AnsibleGroup_frontends'] }}"
+
+    - name: Fail if database {{ pg_db_name }} did not contain table {{ smoke_test_table }}  
+      ansible.builtin.fail:
+      when: item.rowcount != 0
+      with_items: "{{ db_table_query.results }}"
+...
