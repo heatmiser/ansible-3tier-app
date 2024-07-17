@@ -7,13 +7,14 @@
     - name: Populate service facts
       ansible.builtin.service_facts:
   tasks:
-    block:
-      - name: Call __convert_os from db-tier role       
-        ansible.builtin.import_role:
-          name: db-tier
-          tasks_from: __conversion_{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml
-    rescue:
-      - name: __convert_os from db-tier role
-        debug:
-          msg: "Conversion adjustments for {{ ansible_distribution }}{{ ansible_distribution_major_version }} are not available."
+    - name: Block to call OS ansible_distribution and ansible_distribution_major_version specific taskfile
+      block:
+        - name: Call __convert_os from db-tier role       
+          ansible.builtin.import_role:
+            name: db-tier
+            tasks_from: __conversion_{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml
+      rescue:
+        - name: __convert_os from db-tier role
+          debug:
+            msg: "Conversion adjustments for {{ ansible_distribution }}{{ ansible_distribution_major_version }} are not available."
 ...
