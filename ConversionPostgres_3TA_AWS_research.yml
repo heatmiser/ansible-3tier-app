@@ -1,0 +1,10 @@
+---
+- name: Adjustments for EL conversions research
+  become: true
+  hosts: "{{ app_stack_name }}_appdbs"
+  gather_facts: true
+  tasks:
+    - name: Print out ansible_distribution and ansible_distribution_major_version
+      debug:
+        msg: "Current OS: {{ ansible_distribution }}{{ ansible_distribution_major_version }}"
+...
