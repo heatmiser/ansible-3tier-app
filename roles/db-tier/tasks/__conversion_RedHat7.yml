@@ -17,10 +17,14 @@
   register: glibc_common_rpm_find
 
 - name: Check var glibc_common_rpm_find.files
-  debug:
+  ansible.builtin.debug:
     var: glibc_common_rpm_find.files
 
 - name: Check glibc-common package specific path
-  debug:
-    var: glibc_common_rpm_find.files[0].path | basename
+  ansible.builtin.debug:
+    msg:
+      - "basename: {{ glibc_common_rpm_find.files[0].path | basename }}"
+      - "dirname:  {{ glibc_common_rpm_find.files[0].path | dirname }}"
+      - "realpath: {{ glibc_common_rpm_find.files[0].path | realpath }}"
+      - "relpath:  {{ glibc_common_rpm_find.files[0].path | relpath }}"
 ...
