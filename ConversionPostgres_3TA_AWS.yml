@@ -3,9 +3,6 @@
   become: true
   hosts: "{{ app_stack_name }}_appdbs"
   gather_facts: true
-  pre_tasks:
-    - name: Populate service facts
-      ansible.builtin.service_facts:
   tasks:
     - name: Block to call OS ansible_distribution and ansible_distribution_major_version specific taskfile
       block:
