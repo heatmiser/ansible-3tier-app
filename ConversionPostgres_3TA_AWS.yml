@@ -1,0 +1,19 @@
+---
+- name: Adjustments for EL conversions
+  become: true
+  hosts: "{{ app_stack_name }}_appdbs"
+  gather_facts: true
+  pre_tasks:
+    - name: Populate service facts
+      ansible.builtin.service_facts:
+  tasks:
+    block:
+      - name: Call __convert_os from db-tier role       
+        ansible.builtin.import_role:
+          name: db-tier
+          tasks_from: __conversion_{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml
+    rescue:
+      - name: __convert_os from db-tier role
+        debug:
+          msg: "Conversion adjustments for {{ ansible_distribution }}{{ ansible_distribution_major_version }} are not available."
+...
