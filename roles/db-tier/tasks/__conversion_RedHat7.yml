@@ -22,5 +22,5 @@
 
 - name: Check glibc-common package specific path
   debug:
-    var: glibc_common_rpm_find.files[0].path
+    var: glibc_common_rpm_find.files[0].path | basename
 ...
