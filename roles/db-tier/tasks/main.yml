@@ -68,4 +68,19 @@
     - ansible_facts.services['firewalld.service'] is defined and ansible_facts.services['firewalld.service'].state == 'running'
     - ansible_facts.services['firewalld.service'] is defined and ansible_facts.services['firewalld.service'].status == 'enabled'
   tags: firewall
+
+- name: Oracle Linux 7 preparations for future conversions
+  when:
+    - ansible_distribution == "OracleLinux"
+    - ansible_distribution_major_version|int == 7
+  block:
+    - name: Create OL7 glibc-common package storage directory
+      ansible.builtin.file:
+        path: /srv/OracleLinux7/glibc-common
+        state: directory
+        mode: '0755'
+
+    - name: Download OL7 glibc-common package locally
+      ansible.builtin.command: >-
+        yumdownloader -v --destdir=/srv/OracleLinux7/glibc-common glibc-common
 ...
