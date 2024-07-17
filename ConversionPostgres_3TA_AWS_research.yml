@@ -5,7 +5,7 @@
   gather_facts: true
   tasks:
     - name: Print out ansible_distribution and ansible_distribution_major_version
-      debug:
+      ansible.builtin.debug:
         msg: "Current OS: {{ ansible_distribution }}{{ ansible_distribution_major_version }}"
 
     - ansible.builtin.set_fact:
@@ -13,7 +13,7 @@
         _3ta_os_major_version: "{{ ansible_distribution_major_version }}"
 
     - name: Call __convert_os from db-tier role       
-      ansible.builtin.import_role:
+      ansible.builtin.include_role:
         name: db-tier
         tasks_from: "__conversion_{{ _3ta_os_distribution }}{{ _3ta_os_major_version }}.yml"
 ...
