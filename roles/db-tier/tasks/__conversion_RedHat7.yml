@@ -5,10 +5,10 @@
     path: /srv/OracleLinux7/glibc-common
   register: OracleLinux7_glibc_common
 
-- name: Fail /srv/OracleLinux7/glibc-common directory does not exist
+- name: Fail if /srv/OracleLinux7/glibc-common directory does not exist
   ansible.builtin.fail:
     msg: "/srv/OracleLinux7/glibc-common directory does not exist, fail playbook run."
-  when: OracleLinux7_glibc_common.stat.isdir is defined and OracleLinux7_glibc_common.stat.isdir
+  when: OracleLinux7_glibc_common.stat.isdir is not defined and not OracleLinux7_glibc_common.stat.isdir
 
 - name: Find specific glibc-common rpm filename in /srv/OracleLinux7/glibc-common
   ansible.builtin.find:
