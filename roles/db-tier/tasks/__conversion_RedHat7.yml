@@ -13,7 +13,7 @@
 - name: Find specific glibc-common rpm filename in /srv/OracleLinux7/glibc-common
   ansible.builtin.find:
     paths: /srv/OracleLinux7/glibc-common
-    patterns: "glibc_common*.rpm"
+    patterns: "glibc-common*.rpm"
   register: glibc_common_rpm_find
 
 - name: Check var glibc_common_rpm_find.files
