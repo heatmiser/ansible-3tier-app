@@ -7,7 +7,7 @@
 
 - name: Fail if /srv/OracleLinux7/glibc-common directory does not exist
   ansible.builtin.fail:
-    msg: "/srv/OracleLinux7/glibc-common directory does not exist, fail playbook run."
+    msg: "/srv/OracleLinux7/glibc-common directory does not exist, exiting..."
   when: OracleLinux7_glibc_common.stat.isdir is not defined and not OracleLinux7_glibc_common.stat.isdir
 
 - name: Find specific glibc-common rpm filename in /srv/OracleLinux7/glibc-common
@@ -19,6 +19,11 @@
 - name: Check var glibc_common_rpm_find.files
   ansible.builtin.debug:
     var: glibc_common_rpm_find.files
+
+- name: Fail if glibc-common rpm package is not present
+  ansible.builtin.fail:
+    msg: "glibc-common rpm package is not present, exiting..."
+  when: glibc_common_rpm_find.files[0].stat.isfile is not defined and not glibc_common_rpm_find.files[0].stat.isfile
 
 - name: Check glibc-common package specific path
   ansible.builtin.debug:
