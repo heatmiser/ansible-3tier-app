@@ -40,5 +40,5 @@
 - name: Check glibc-common package specific path
   ansible.builtin.debug:
     msg:
-      - "basename_sansext: {{ glibc_common_basename.split('.')[1] }}"
+      - "basename_sansext: {{ glibc_common_basename.split('.')[-1] }}"
 ...
