@@ -41,4 +41,5 @@
   ansible.builtin.debug:
     msg:
       - "basename_sansext: {{ glibc_common_basename.split('.')[-1] }}"
+      - "basename_sansext: {{ glibc_common_basename | splitext | first }}"
 ...
