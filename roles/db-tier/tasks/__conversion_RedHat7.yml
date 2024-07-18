@@ -62,4 +62,14 @@
     chdir: "{{ glibc_common_rpm_find.files[0].path | dirname }}"
   register: glibc_common_cpio_extract
   changed_when: glibc_common_cpio_extract.rc != 0
+
+- name: Use cpio copy-pass to copy C.utf8 to /usr/lib/locale
+  ansible.builtin.shell: |
+    set -o pipefail
+    find C.utf8/ -depth -print | cpio -pamVd /usr/lib/locale
+  args:
+    executable: /bin/bash
+    chdir: "{{ glibc_common_rpm_find.files[0].path | dirname }}/usr/lib/locale"
+  register: glibc_common_cpio_copy_pass
+  changed_when: glibc_common_cpio_copy_pass.rc != 0
 ...
