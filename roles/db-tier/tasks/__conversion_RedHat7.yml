@@ -13,7 +13,7 @@
 - name: Find specific glibc-common rpm filename in /srv/OracleLinux7/glibc-common
   ansible.builtin.find:
     paths: /srv/OracleLinux7/glibc-common
-    patterns: "*.rpm"
+    patterns: "glibc_common*.rpm"
   register: glibc_common_rpm_find
 
 - name: Check var glibc_common_rpm_find.files
@@ -40,6 +40,6 @@
 - name: Check glibc-common package specific path
   ansible.builtin.debug:
     msg:
-      - "basename_sansext: {{ glibc_common_basename.split('.')[-1] }}"
+      - "basename_ext: {{ glibc_common_basename.split('.')[-1] }}"
       - "basename_sansext: {{ glibc_common_basename | splitext | first }}"
 ...
