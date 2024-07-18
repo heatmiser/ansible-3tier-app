@@ -23,7 +23,7 @@
 - name: Fail if glibc-common rpm package is not present
   ansible.builtin.fail:
     msg: "glibc-common rpm package is not present, exiting..."
-  when: glibc_common_rpm_find.files[0].stat.isfile is not defined and not glibc_common_rpm_find.files[0].stat.isfile
+  when: glibc_common_rpm_find.files[0].path is not defined and glibc_common_rpm_find.files[0].islnk
 
 - name: Check glibc-common package specific path
   ansible.builtin.debug:
