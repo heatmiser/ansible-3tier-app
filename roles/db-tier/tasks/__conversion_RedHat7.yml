@@ -32,5 +32,13 @@
       - "dirname:  {{ glibc_common_rpm_find.files[0].path | dirname }}"
       - "realpath: {{ glibc_common_rpm_find.files[0].path | realpath }}"
       - "relpath:  {{ glibc_common_rpm_find.files[0].path | relpath }}"
-      - "basename_sansext: {{ glibc_common_rpm_find.files[0].path | basename | split('.')[1] }}"
+
+- name: Set variable for glibc-common package basename
+  ansible.builtin.set_fact:
+    glibc_common_basename: "{{ glibc_common_rpm_find.files[0].path | basename }}"
+
+- name: Check glibc-common package specific path
+  ansible.builtin.debug:
+    msg:
+      - "basename_sansext: {{ glibc_common_basename.split('.')[1] }}"
 ...
