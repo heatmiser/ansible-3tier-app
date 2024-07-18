@@ -32,4 +32,5 @@
       - "dirname:  {{ glibc_common_rpm_find.files[0].path | dirname }}"
       - "realpath: {{ glibc_common_rpm_find.files[0].path | realpath }}"
       - "relpath:  {{ glibc_common_rpm_find.files[0].path | relpath }}"
+      - "basename_sansext: {{ glibc_common_rpm_find.files[0].path | basename | split('.')[1] }}"
 ...
