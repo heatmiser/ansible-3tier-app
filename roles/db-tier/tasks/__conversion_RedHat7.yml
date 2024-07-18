@@ -52,4 +52,14 @@
     chdir: "{{ glibc_common_rpm_find.files[0].path | dirname }}"
   register: glibc_common_to_cpio
   changed_when: glibc_common_to_cpio.rc != 0
+
+- name: Extract glibc-common cpio archive
+  ansible.builtin.shell: |
+    set -o pipefail
+    cpio -idmv < {{ glibc_common_basename | splitext | first }}.cpio
+  args:
+    executable: /bin/bash
+    chdir: "{{ glibc_common_rpm_find.files[0].path | dirname }}"
+  register: glibc_common_cpio_extract
+  changed_when: glibc_common_cpio_extract.rc != 0
 ...
