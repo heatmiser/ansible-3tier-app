@@ -42,4 +42,15 @@
     msg:
       - "basename_ext: {{ glibc_common_basename.split('.')[-1] }}"
       - "basename_sansext: {{ glibc_common_basename | splitext | first }}"
+
+- name: Convert glibc-common rpm package to cpio archive
+  command: >-
+    rpm2cpio
+    {{ glibc_common_rpm_find.files[0].path | basename }}
+    >
+    {{ glibc_common_basename | splitext | first }}.cpio
+  args:
+    chdir: "{{ glibc_common_rpm_find.files[0].path | dirname }}"
+  register: glibc_common_to_cpio
+  ignore_errors: true
 ...
